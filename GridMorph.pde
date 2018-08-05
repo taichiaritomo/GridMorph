@@ -27,7 +27,7 @@ void setup() {
   noFill();
   
   // Load SVG file
-  s = loadShape("site.svg"); // The file must be in the data folder of the current sketch to load successfully
+  // s = loadShape("site.svg"); // The file must be in the data folder of the current sketch to load successfully
   
   background(255);
   
@@ -37,7 +37,7 @@ void draw() {
   clear();
   background(255);
   
-  shape(s, 0, 0, 1000, 600); // shape(shape, x, y, width, height);
+  // shape(s, 0, 0, 1000, 600); // shape(shape, x, y, width, height);
   
   PVector mousePos = new PVector(mouseX, mouseY);
   mousePos.sub(151, 270);
