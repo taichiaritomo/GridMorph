@@ -3,18 +3,53 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
-    <style> body {padding: 0; margin: 0;} </style>
+<!--    <style> body {padding: 0; margin: 0;} </style>-->
     <script src="../p5.min.js"></script>
     <script src="../addons/p5.dom.min.js"></script>
     <script src="../addons/p5.sound.min.js"></script>
-    <script src="sketch2.js"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="main.css">
   </head>
   <body>
-    MorphGrid.<br>
-    Visualization tool for grid manipulation using points of energy.<br>
-    Designed by Taichi Aritomo
-    <div id="canvasContainer"></div>
-    Click to place a force point.
+    <div id="main-container">
+<!--      <strong>morphgrid</strong>, a visualization tool for manipulating a normative grid using points of energy.<br>-->
+      <div id="canvas-container"></div>
+
+      <div id="menu-fixed">
+        <div id="menu-container">
+          <div id="menu-left">
+            <div id="info-button" class="menu-option toggle">Info</div>
+          </div>
+          
+          <div id="menu-right">
+            <div id="forceFactor" class="menu-option">
+<!--              <span class="gray">Force</span>-->
+              <div id="forceFactor-minus" class="menu-option menu-option-circle">–</div>
+              <span id="forceFactor-value">1600</span>
+              <div id="forceFactor-plus" class="menu-option menu-option-circle">+</div>
+            </div>
+            <div id="originalGrid-button" class="menu-option toggle">Base Grid</div>
+            <div id="morphGrid-button" class="menu-option toggle">DeformedGrid</div>
+            <div id="forcePoints-button" class="menu-option toggle">Points</div>
+          </div>
+          
+<!--
+          <div id="info-container">
+            <p><strong>morphgrid</strong>: a tool for manipulating a normative grid using points of energy.</p>
+            <p>Use the up/down arrow keys to adjust the intensity of force.</p>
+            <span id="colophon">Designed by Taichi Aritomo. <a href="http://taichi.pink">http://taichi.pink</a></span>
+          </div>
+-->
+        </div>
+      </div>
+      
+      
+    </div>
+<!--    <script src="imgTest.js"></script>-->
+    
+    <script src="display.js"></script>
+    <script src="interaction.js"></script>
   </body>
   
 </html>

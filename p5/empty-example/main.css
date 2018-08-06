@@ -1,0 +1,133 @@
+@font-face {
+    font-family: AuthenticSans;
+    src: url(../AUTHENTIC-Sans.woff);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+    font-family: AuthenticSans, 'Helvetica', sans-serif;
+}
+
+body {
+  font-size: 18px;
+  background: #f2f2f2;
+  margin: 0;
+  padding: 0;
+}
+
+span.gray {
+  color: #999999;
+}
+
+a {
+  color: #999999;
+}
+
+/*-----------------------------------------------------------*/
+
+#main-container {
+  margin: 40px auto;
+  width: 1000px;
+}
+
+#canvas-container {
+  margin: 20px auto 0;
+  cursor: none;
+}
+
+#menu-fixed {
+  width: 100vw;
+  height: 40px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background: #ffffff;
+  border-top: 2px solid #000;
+  color: #000000;
+}
+
+#menu-container {
+  position: relative;
+  width: 1000px;
+  margin: 0 auto;
+  cursor: default;
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;          /* Likely future */ 
+}
+
+.menu-option {
+  height: 28px;
+  padding: 5px 8px;
+/*  margin-top: 4px;*/
+  display: inline-block;
+}
+
+#menu-left {
+  display: inline-block;
+  float: left;
+}
+
+#menu-right {
+  display: inline-block;
+  float: right;
+}
+
+.menu-option.toggle:active {
+  background: #000000;
+  color: #ffffff;
+}
+
+.menu-option.toggle:hover {
+  outline: 1px solid #000000;
+}
+
+#forceFactor {
+  margin-right: 20px;
+}
+
+.menu-option-circle {
+  border-radius: 14px;
+}
+
+.menu-option-circle.active {
+  background: #000000;
+  color: #ffffff;
+}
+
+.menu-option-circle:active {
+  background: #000000;
+  color: #ffffff;
+}
+
+.menu-option-circle:hover {
+  box-shadow:inset 0px 0px 0px 1px #000000;
+}
+
+#originalGrid-button {
+  margin-right: 20px;
+}
+
+#morphGrid-button {
+  margin-right: 20px;
+}
+
+#info-container {
+  background: #ffffff;
+  position:absolute;
+  padding: 10px;
+  width: 400px;
+  max-height: 400px;
+  left: 0px;
+  bottom: 10px;
+  outline: 2px solid #000000;
+}
+
+#colophon {
+  color: #999999;
+  font-size: 12px;
+}
