@@ -12,7 +12,7 @@ html {
 }
 
 body {
-  font-size: 18px;
+  font-size: 16px;
   background: #f2f2f2;
   margin: 0;
   padding: 0;
@@ -22,6 +22,10 @@ span.gray {
   color: #999999;
 }
 
+span.pink {
+  color: #fa5f83;
+}
+
 a {
   color: #999999;
 }
@@ -29,29 +33,36 @@ a {
 /*-----------------------------------------------------------*/
 
 #main-container {
-  margin: 40px auto;
+  margin: 40px auto 80px;
   width: 1000px;
 }
 
 #canvas-container {
-  margin: 20px auto 0;
+  margin: 20px auto;
   cursor: none;
+}
+
+#canvas-container.show-cursor {
+  cursor:  default;
 }
 
 #menu-fixed {
   width: 100vw;
-  height: 40px;
+  height: 41px;
   position: fixed;
   bottom: 0;
   left: 0;
   background: #ffffff;
   border-top: 2px solid #000;
+  box-sizing: border-box;
   color: #000000;
 }
 
 #menu-container {
+  display: flex;
+  justify-content: space-between;
   position: relative;
-  width: 1000px;
+  max-width: 1000px;
   margin: 0 auto;
   cursor: default;
   -webkit-user-select: none;  /* Chrome all / Safari all */
@@ -60,38 +71,90 @@ a {
   user-select: none;          /* Likely future */ 
 }
 
+.menu-group {
+  margin-top: 6px;
+}
+
 .menu-option {
   height: 28px;
+  display: inline-block;
+}
+
+.menu-button {
   padding: 5px 8px;
-/*  margin-top: 4px;*/
-  display: inline-block;
+  box-shadow:inset 0px 0px 0px 1px #999999;
+  cursor: pointer;
 }
 
-#menu-left {
-  display: inline-block;
-  float: left;
+.menu-button:hover {
+  box-shadow:inset 0px 0px 0px 1px #000000;
 }
 
-#menu-right {
-  display: inline-block;
-  float: right;
-}
-
-.menu-option.toggle:active {
+.menu-button:active {
   background: #000000;
   color: #ffffff;
 }
 
-.menu-option.toggle:hover {
-  outline: 1px solid #000000;
+.menu-button.highlight {
+  background: #fa5f83;
+  box-shadow:inset 0px 0px 0px 1px #fa5f83;
 }
 
-#forceFactor {
-  margin-right: 20px;
+.menu-button.highlight:hover {
+  box-shadow:inset 0px 0px 0px 1px #000000;
+}
+
+#info-container {
+  background: #ffffff;
+  position:absolute;
+  padding: 10px;
+  width: 400px;
+  max-height: 400px;
+  left: 0px;
+  bottom: 45px;
+  box-shadow:inset 0px 0px 0px 2px #000000;
+}
+
+#info-container.hidden {
+  display: none;
+}
+
+input #image-input {
+  display: inline-block;
+  width: 50px;
+}
+
+.menu-option.toggle {
+  cursor: pointer;
+  padding: 5px;
+  background: #ffffff;
+  color: #000000;
+  text-decoration: line-through;
+}
+
+.menu-option.toggle.selected {
+  background: #ffffff;
+  text-decoration: none;
+}
+
+.menu-option.toggle:not(.selected):hover {
+  color: #0000ff;
+}
+
+.menu-option.toggle:hover { /* outline */
+  color: #0000ff;
+}
+
+.menu-option.toggle:active { /* blacken */
+  font-weight: bold;
 }
 
 .menu-option-circle {
+  width: 28px;
+  text-align: center;
+  padding: 5px;
   border-radius: 14px;
+  cursor: pointer;
 }
 
 .menu-option-circle.active {
@@ -108,26 +171,11 @@ a {
   box-shadow:inset 0px 0px 0px 1px #000000;
 }
 
-#originalGrid-button {
-  margin-right: 20px;
-}
-
-#morphGrid-button {
-  margin-right: 20px;
-}
-
-#info-container {
-  background: #ffffff;
-  position:absolute;
-  padding: 10px;
-  width: 400px;
-  max-height: 400px;
-  left: 0px;
-  bottom: 10px;
-  outline: 2px solid #000000;
-}
-
 #colophon {
   color: #999999;
   font-size: 12px;
+}
+
+#file-upload-container {
+  display: none;
 }
