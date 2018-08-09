@@ -54,6 +54,17 @@ menu_toggles.forces.element.addEventListener("click", function() {
   document.querySelector("#canvas-container").classList.toggle("show-cursor");
 });
 
+var algorithm_selector = document.getElementById("algorithm-selector");
+algorithm_selector.addEventListener("click", function() {
+  if (algorithm == "SEQUENTIAL") {
+    algorithm_selector.innerHTML = 'Simultaneous&nbsp<span class="gray">(volatile)</span>';
+    algorithm = "SIMULTANEOUS";
+  } else {
+    algorithm_selector.innerHTML = 'Sequential&nbsp<span class="gray">(intuitive)</span>';
+    algorithm = "SEQUENTIAL";
+  }
+});
+
 // Info Container Toggle
 var info_visible = true;
 var info_toggle = document.querySelector("#info-button");
@@ -158,27 +169,30 @@ function adjustForceFactor(exponent) {
   if (exponent == 1 && cursorPoint.forceFactor>=forceFactorMax || exponent == -1 && cursorPoint.forceFactor<=forceFactorMin)
     return;
   cursorPoint.forceFactor *= pow(2, exponent);
-  document.getElementById('forceFactor-value').innerHTML = cursorPoint.forceFactor/100;
+  document.getElementById('forceFactor-value').innerHTML = cursorPoint.forceFactor;
 }
 
 
-/* -------------- PROCESSING CLICK/KEY EVENTS --------------*/
+/* -------------- PROCESSING CLICK/KEY/HOVER EVENTS --------------*/
 // Click events
 function mouseClicked() {
-  // Save forcePoint
+  // Ignore clicks outside window
   if (!window.ev) {
     return;
   }
   
+  if (!menu_toggles.forces.parameter) return;
+  
+  // Delete force
   for (var i = 1; i < forcePoints.length; i++) {
     // Check if hovering over fixed forcePoint
-    var current = forcePoints[i];
-    if (current.hover) {
+    if (forcePoints[i].hover) {
       forcePoints.splice(i, 1);
       return;
     }
   }
   
+  // Create force
   forcePoints.push(new ForcePoint(cursorPoint.center, cursorPoint.forceFactor, cursorPoint.forceExp, cursorPoint.forceIntensity, "CONTRACTING"));
 }
 
@@ -198,4 +212,18 @@ function keyPressed() {
     keyAdjustForceFactor(-1);
   }
   return false;
+}
+
+// Checks hover state for each forcePoint
+function checkForcePointHover() {
+  if (!menu_toggles.forces.parameter) return;
+  for (var i = 1; i < forcePoints.length; i++) {
+    var current = forcePoints[i];
+    if (abs(mouseX-offsetX - current.center.x) < 8 && abs(mouseY-offsetY - current.center.y) < 8) {
+      current.hover = true;
+      showCursor = false;
+    } else { // Not hovering
+      current.hover = false;
+    }
+  }
 }

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>deform-grid 1</title>
     <meta charset="utf-8">
     <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
 <!--    <style> body {padding: 0; margin: 0;} </style>-->
@@ -30,17 +31,17 @@
           </div>
           
           <div class="menu-group">
+            <div id="algorithm-selector" class="menu-option toggle selected">Sequential&nbsp<span class="gray">(intuitive)</span></div>
             <div id="forceFactor" class="menu-option">
-<!--              <span class="gray">Force</span>-->
-              <div id="forceFactor-minus" class="menu-option menu-option-circle">–</div>
-              <span id="forceFactor-value">64</span>
-              <div id="forceFactor-plus" class="menu-option menu-option-circle">+</div>
+              <div id="forceFactor-minus" class="menu-option-circle">–</div>
+              <span id="forceFactor-value">128</span>
+              <div id="forceFactor-plus" class="menu-option-circle">+</div>
             </div>
           </div>
           
           <div class="menu-group">       
             <span class="gray">Layers:</span>
-            <div id="originalGrid-button" class="menu-option toggle">BaseGrid</div>
+            <div id="originalGrid-button" class="menu-option toggle"><u>B</u>aseGrid</div>
             <div id="forcePoints-button" class="menu-option toggle selected">Forces</div>
             <div id="image-button" class="menu-option toggle selected ">Image</div>
             <div id="morphGrid-button" class="menu-option toggle selected">DeformGrid</div>
@@ -48,17 +49,18 @@
           
           
           <div id="info-container">
-            <p><strong>deform-grid 1</strong>
-              manipulates a normative grid using points of gravity</p>
             <p>
-              <span class="pink">click </span>create/delete forces<br>
-              <span class="pink">arrow keys </span>decrease/increase force<br>
+              <strong>Controls</strong><br>
+              <span class="pink">Click </span>to create & <span class="red">delete</span> forces<br>
+              <span class="pink">Arrow Keys </span>decrease / increase force<br>
             </p>
             <p>
-              <span id="colophon">Designed and built by <a href="http://taichi.pink">Taichi Aritomo</a>
-              using <a href="https://p5js.org">p5.js</a>.<br>
-              Typeface: <a href="http://authentic.website/sans.html">Authentic</a>.
-              Default image: <a href="https://en.wikipedia.org/wiki/Bliss_(image)">Microsoft</a>
+              <span id="colophon">
+                <strong>deform-grid 1</strong> is an interface for manipulating a grid using points of force.<br>
+                Made by <a href="http://taichi.pink">Taichi Aritomo</a>
+                using <a href="https://p5js.org">p5.js</a>.<br>
+                Typeface: <a href="http://authentic.website/sans.html">Authentic</a>.
+                Default image: <a href="https://en.wikipedia.org/wiki/Bliss_(image)">Microsoft</a>
               </span>
             </p>
           </div>

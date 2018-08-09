@@ -16,10 +16,10 @@ var gridWidth = maxGridWidth,
     j_max; // Low-res grid height (y)
 
 // FORCES
-var forceFactorMin = 100,
-    forceFactorMax = 409600;
-
-var parameterThreshold = 0.001;
+var forceFactorMin = 1,
+    forceFactorMax = 4096;
+var parameterThreshold = 0.001; // minimum interpolation parameter for calculations
+var algorithm = "SEQUENTIAL";
 
 function ForcePoint(center, forceFactor, forceExp, forceIntensity, type) {
   this.center = center;                 // central point as p5.vector
@@ -32,7 +32,8 @@ function ForcePoint(center, forceFactor, forceExp, forceIntensity, type) {
 
 var forcePoints = []; // array of forcePoints. [0] is reserved for cursorPoint
 var cursorPoint; // forcePoint corresponding to active cursor
-var skipCursorCompute; // boolean: if true, skip cursor in deformGrid computation
+var showCursor = true;
+var skipCursorCompute = false; // boolean: if true, skip cursor in deformGrid computation
 
 // Array of deformedGrid points
 var deformedGridPoints = [];
@@ -71,7 +72,7 @@ function setup() {
   j_max = gridHeight / gridInterval;
   
   var forceOrigin = createVector(300, 300);
-  forcePoints.push(new ForcePoint(forceOrigin, 6400, -40, 12, "CONTRACTING"));
+  forcePoints.push(new ForcePoint(forceOrigin, 128, -2, 12, "CONTRACTING"));
   cursorPoint = forcePoints[0];
   
 //  noLoop();
@@ -93,8 +94,12 @@ function draw() {
   push();
   translate(offsetX, offsetY);
   
+  showCursor = window.ev;
+  
+  // Check forcePointHover
+  checkForcePointHover();
+  
   // Calculate deformations
-  skipCursor = window.ev ? 0 : 1; // if mouse is inside canvas, include cursor force. otherwise, skip.
   computeDeformedGrid();
   
   // Draw distorted grid
@@ -121,17 +126,27 @@ function draw() {
   pop();  
 }
 
-// readjusts offsets to center grid
+// Readjusts offsets to center grid.
+// Also adjusts forcePoint centers.
 function adjustOffsets() {
-  offsetX = (width - gridWidth)/2;
-  offsetY = (height - gridHeight)/2;
+  var newOffsetX = (width - gridWidth)/2;
+  var newOffsetY = (height - gridHeight)/2;
+  
+  for (var i = 1; i < forcePoints.length; i++) {
+    var current = forcePoints[i];
+    current.center.x += (offsetX - newOffsetX);
+    current.center.y += (offsetY - newOffsetY);
+  }
+  
+  offsetX = newOffsetX;
+  offsetY = newOffsetY;
 }
 
 function drawForcePoint(fp) {
   push();
   translate(fp.center.x, fp.center.y);
-  var numLines = -2 * fp.forceExp;
-    var radius = fp.forceFactor / 64;
+  var numLines = -48 * fp.forceExp;
+    var radius = 0.8 * fp.forceFactor;
     for (var j = 0; j < numLines; j++) {
       var angle = (j / numLines)*360;
       push();
@@ -144,31 +159,24 @@ function drawForcePoint(fp) {
 
 // Draws force points. Handles hover states.
 function drawForcePoints() {
-  var showCursor = true;
-  stroke("#000000");
-  strokeWeight(0.1);
-  
+  // Draw fixed forces
   for (var i = 1; i < forcePoints.length; i++) {
     // Check if hovering over fixed forcePoint
     var current = forcePoints[i];
-    if (abs(mouseX-offsetX - current.center.x) < 10 && abs(mouseY-offsetY - current.center.y) < 10) {
-//      current.hover = true;
-      
-      stroke("#ff0000"); // color red.
-      if (mouseIsPressed)
-        strokeWeight(0.5);
-      showCursor = false;
-    } else { // Not hovering
-//      current.hover = false;
+    if (current.hover) {
+      stroke("#ff0000");
+      if (mouseIsPressed) strokeWeight(0.5);
+    } else {
       strokeWeight(0.1);
       stroke("#000000");
     }
     drawForcePoint(current)
   }
   
-  if (showCursor && window.ev) {
-    if (mouseIsPressed)
-      strokeWeight(0.5);
+  // Draw cursor force
+  if (showCursor) {
+    stroke("#000000");
+    strokeWeight(mouseIsPressed ? 0.5 : 0.1); // emphasize mouseDown
     drawForcePoint(forcePoints[0]);
   }
 }
@@ -183,40 +191,56 @@ function computeDeformedGrid() {
     var y;
     var j = 0;
     for (y = 0; y <= gridHeight; y += gridInterval, j++) {
-      if (forcePoints.length == 1 && !window.ev) {
-        row.push(createVector(x, y));
-        continue;
-      }
-
       // Contracting: Applies gravitational force toward forcePoint, along an inverse exponential curve with parameters forceFactor and forceExp
-
-      // A collection of versions of the same normGridPoint, with each one displaced by a different forcePoint
-      var displacements = [];
-
-      // Calculate each displacement
-      for (var k = skipCursor; k < forcePoints.length; k++) {
-        var fp = forcePoints[k];
-        var displacedPoint = createVector(x, y);
-        var distanceToFP = p5.Vector.dist(fp.center, displacedPoint);
-        var a = pow(distanceToFP/fp.forceFactor + 1, fp.forceExp);
-        if (a > parameterThreshold) {
-          var parametrizedCenter = fp.center.copy().mult(a);
-          displacedPoint.mult(1.0 - a).add(parametrizedCenter);
+      if (algorithm == "SIMULTANEOUS") {
+        // Simultaneous-Displacement Algorithm
+        // Adds displacement vectors
+        var totalDisplacement = createVector(0,0);
+        // Calculate displacement from each force point
+        var initialIndex = window.ev ? 0 : 1;
+        for (var k = initialIndex; k < forcePoints.length; k++) {
+          var fp = forcePoints[k];
+          if (fp.hover) continue;
+          var baseGridPoint = createVector(x, y);
+//          var distanceToFP = distApprox(fp.center, baseGridPoint);
+          var distanceToFP = p5.Vector.dist(fp.center, baseGridPoint);
+          var parameter = pow(distanceToFP/fp.forceFactor + 1, fp.forceExp);
+//          var parameter = parametricGravityFunction(distanceToFP, fp.forceFactor);
+          if (parameter > parameterThreshold) {
+            var displacedPoint = p5.Vector.lerp(baseGridPoint, fp.center, parameter);
+            var displacement = p5.Vector.sub(displacedPoint, baseGridPoint);
+            totalDisplacement.add(displacement);
+          }
         }
-        displacements.push(displacedPoint);
+        var morphGridPoint = createVector(x, y).add(totalDisplacement);
+        row.push(morphGridPoint);
+      } else if (algorithm == "SEQUENTIAL") {
+        // Sequential-Displacement Algorithm
+        // Interpolates displaced points one by one
+        var displacedPoint = createVector(x, y);
+        var initialIndex = 1;
+        for (var k = initialIndex; k < forcePoints.length; k++) { 
+          var fp = forcePoints[k];
+          if (fp.hover) continue;
+//          var distanceToFP = distApprox(fp.center, displacedPoint);
+          var distanceToFP = p5.Vector.dist(fp.center, displacedPoint);
+           var parameter = pow(distanceToFP/fp.forceFactor + 1, fp.forceExp);
+//          var parameter = parametricGravityFunction(distanceToFP, fp.forceFactor);
+          if (parameter > parameterThreshold) {
+            displacedPoint.lerp(fp.center, parameter);
+          }
+        }
+        if (window.ev) {
+          var fp = forcePoints[0];
+          if (fp.hover) continue;
+          var distanceToFP = p5.Vector.dist(fp.center, displacedPoint);
+          var parameter = pow(distanceToFP/fp.forceFactor + 1, fp.forceExp);
+          if (parameter > parameterThreshold) {
+            displacedPoint.lerp(fp.center, parameter);
+          }
+        }
+        row.push(displacedPoint);
       }
-
-      // Average the displacements to receive final morphGridPoint
-      var xSum = 0, ySum = 0;
-      for (var k = 0; k < displacements.length; k++) {
-        var displacement = displacements[k];
-        xSum += displacement.x;
-        ySum += displacement.y;
-      }
-      var morphGridPoint = createVector(x, y);
-      morphGridPoint.x = xSum / (displacements.length);
-      morphGridPoint.y = ySum / (displacements.length);
-      row.push(morphGridPoint);
     }
     deformedGridPoints[i] = row;
   }
@@ -303,4 +327,42 @@ function drawNormGrid() {
     curveVertex(x - gridInterval, y); // end control point
     endShape();
   }
+}
+
+// Distance function using Taylor approximation. Accepts two p5.Vectors
+function distApprox(u, v) {
+  var t_1 = pow(u.x - v.x, 2) + pow(u.x - v.x, 2) - 1;
+  var t_2 = t_1*t_1;
+  return 1 + 0.5*t_1 - 0.125*t_2 + 0.0625*t_2*t_1 - 0.0390625*t_2*t_2;
+}
+
+// Parametric Gravity Function
+// Returns Taylor approximation of y = (t/forceFactor + 1)^(-2)
+function parametricGravityFunction(t, forceFactor) {
+  var t_2 = t*t,
+      t_3 = t_2*t,
+      t_4 = t_2*t_2;
+  switch (forceFactor) {
+//    case 1:
+//      return 0;
+//    case 2:
+//      return (1 - t + 0.75*t_2 - 0.5*t_3 + 0.3125*t_4);
+//    case 4:
+//      return (1 - 0.5*t + 0.1875*t_2 - 0.0625*t_3 + 0.01953125*t_4);
+//    case 8:
+//      return (1 - 0.25*t + 0.046875*t_2 - 0.0078125*t_3 + 0.001220703125*t_4);
+//    case 16:
+//      return (1 - 0.125*t + 0.01171875*t_2 - 0.0009765625*t_3 + 0.00007629394531*t_4);
+//    case 32:
+//      return (1 - 0.0625*t + 0.0029296875*t_2 - 0.0001220703125*t_3 + 0.000004768371582*t_4);
+//    case 64:
+//      return (1 - 0.03125*t + 0.000732421875*t_2 - 0.00001525878906*t_3 + 0.0000002980232239*t_4);
+//    case 128:
+//      return (1 - 0.015625*t + 0.0001831054688*t_2 - 0.000001907348633*t_3 + 0.00000001862645149*t_4);
+//    case 256:
+//      return (1 - 0.0078125*t + 0.00004577636719*t_2 - 0.0000002384185791*t_3 + 0.000000001164153218*t_4);
+    default:
+      return pow(t/forceFactor + 1, -2);
+  }
+  
 }
