@@ -211,6 +211,26 @@ function keyPressed() {
   else if (keyCode === LEFT_ARROW || keyCode === DOWN_ARROW) {
     keyAdjustForceFactor(-1);
   }
+  else if (keyCode === 66) {
+    var toggle = menu_toggles.baseGrid;
+    toggle.element.classList.toggle("selected");
+    toggle.parameter = !toggle.parameter;
+  }
+  else if (keyCode === 70) {
+    var toggle = menu_toggles.forces;
+    toggle.element.classList.toggle("selected");
+    toggle.parameter = !toggle.parameter;
+  }
+  else if (keyCode === 73) {
+    var toggle = menu_toggles.image;
+    toggle.element.classList.toggle("selected");
+    toggle.parameter = !toggle.parameter;
+  }
+  else if (keyCode === 68) {
+    var toggle = menu_toggles.deformGrid;
+    toggle.element.classList.toggle("selected");
+    toggle.parameter = !toggle.parameter;
+  }
   return false;
 }
 
